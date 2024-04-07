@@ -53,15 +53,15 @@ pub fn abbrev_num(number: isize, options: Option<Options>) -> Option<String> {
     }
 
     let options = options.unwrap_or_default();
-    let absolute = number.abs() as usize;
-    let level = (absolute.ilog10() / 3) | 0;
-    let sign = number.is_negative().then_some("-").unwrap_or("");
+    let absolute = number.unsigned_abs();
+    let level = absolute.ilog10() / 3;
+    let sign = if number.is_negative() { "-" } else { "" };
     let precision = options.precision.unwrap_or(1);
 
     let abbreviation = if let Some(abbreviations) = options.abbreviations {
-        abbreviations.get(level as usize).map(|v| *v)
+        abbreviations.get(level as usize).copied()
     } else {
-        ABBREVIATIONS.get(level as usize).map(|v| *v)
+        ABBREVIATIONS.get(level as usize).copied()
     }?;
 
     if level == 0 {
